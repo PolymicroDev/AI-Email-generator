@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Email Creator Tool</title>
+</head>
+<body>
+    <h1>Email Creator Tool</h1>
+    <form id="emailForm">
+        <label for="prompt">Email Prompt:</label>
+        <input type="text" id="prompt" name="prompt" placeholder="Enter email prompt...">
+        <button type="button" onclick="generateEmail()">Generate Email</button>
+    </form>
+
+    <div id="emailBody">
+        <textarea id="emailText" rows="10" cols="50" placeholder="Generated email will appear here..."></textarea>
+    </div>
+
+    <h3>Change Tone</h3>
+    <button type="button" onclick="changeTone('formal')">Formal</button>
+    <button type="button" onclick="changeTone('casual')">Casual</button>
+    <button type="button" onclick="changeTone('friendly')">Friendly</button>
+
+    <script>
+        function generateEmail() {
+            const prompt = document.getElementById('prompt').value;
+
+            fetch('/generate_email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `prompt=${encodeURIComponent(prompt)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('emailText').value = data.email;
+            });
+        }
+
+        function changeTone(tone) {
+            const emailBody = document.getElementById('emailText').value;
+
+            fetch('/change_tone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `tone=${encodeURIComponent(tone)}&email_body=${encodeURIComponent(emailBody)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('emailText').value = data.new_email;
+            });
+        }
+    </script>
+</body>
+</html>
